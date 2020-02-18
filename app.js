@@ -21,6 +21,8 @@ if (!configuration) {
 const nodetype = configuration.active;
 const config = configuration[nodetype];
 
+console.log(config)
+
 // get general app settings
 const savedSettings = local.getItem('gensettings');
 let genCfg = {};
@@ -179,11 +181,19 @@ const initialize = () => {
         initialize();
       }, genCfg.initInterval || defaultInterval);
     } else {
-      ident.taddr = taddr;
+
+	  console.log("Node address is supposed to be " + taddr + "but is forced to " + config.taddr)
+
+	  taddr = config.taddr
+      ident.taddr = taddr
+
       console.log(`Node t_address (not for stake)=${taddr}`);
       SNode.ident = ident;
       console.log(logtime(), 'Checking private z-addresses...');
       SNode.getAddrWithBal((error, result) => {
+        console.log("result of get z-addresses")
+        console.log(result)
+        console.log(error)
         if (error || result === 'Unable to get a z-addr balance') {
           console.error(logtime(), error || result);
           setTimeout(() => {
@@ -191,6 +201,8 @@ const initialize = () => {
           }, genCfg.initInterval || defaultInterval);
           return;
         }
+
+		console.log(result)
 
         if (result.bal === 0 && result.valid) {
           console.log('Challenge private address balance is 0');
@@ -213,6 +225,9 @@ const initialize = () => {
         console.log(result.addr);
 
         ident.email = config.email;
+        console.log("At the end ident is ")
+        console.log(ident)
+
         SNode.getNetworks(null, (err2, nets) => {
           if (!err2) {
             ident.nets = nets;
